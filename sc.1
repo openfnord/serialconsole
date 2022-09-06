@@ -1,0 +1,128 @@
+.\" Copyright (c) 2006 Stefan Bethke <stb@lassitu.de>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.\"
+.Dd July 11, 2007
+.Dt SC 1
+.Os
+.Sh NAME
+.Nm sc
+.Nd provide console for system connected to a serial device
+.Sh SYNOPSIS
+.Nm
+.Op Fl fmq
+.Op Fl d Ar ms
+.Op Fl e Ar escape
+.Op Fl p Ar parameters
+.Op Fl s Ar speed
+.Op Ar device
+.Sh DESCRIPTION
+The
+.Nm
+utility opens the specified serial
+.Ar device
+and configures it according to the given parameters.  It then relays characters
+received on the device to the terminal, and forwards characters from the
+terminal to the device.
+.Pp
+The optional
+.Ar device
+(default
+.Dq cuad0 )
+is the name of the device special file to open for the serial device.  If
+the name does not include a
+.Dq / ,
+.Dq /dev
+will be prepended.
+.Pp
+The following options are available:
+.Bl -tag -width Ds
+.It Fl d Ar ms
+Delay further execution by
+.Ar ms
+milliseconds after a newline character is
+sent to the serial port.
+.It Fl e Ar ch
+Sets the escape character to use.  Setting the character to
+.Dq none
+disables any escapes.
+.It Fl f
+Use hardware flow control.  Sets the CRTSCTS flag on the serial device to
+enable hardware flow control.  The actual effect of CRTSCTS depends on the
+device driver.
+.It Fl m
+Honor the modem control lines.  Normally,
+.Nm
+sets the CLOCAL flag on the serial device to ignore modem control lines.
+The actual effect of CLOCAL depends on the device driver.
+.It Fl p Ar bits-per-character parity stop-bits
+Set serial character format.  The first digit specifies the number of data
+bits in a character (5, 6, 7, or 8).  The middle character determines parity
+(Even, None, or Odd).  The last digit sets the number of stop bits (1 or 2).
+Default
+.Dq 8N1 .
+.It Fl s Ar speed
+Use
+.Ar speed
+bits per second.  Available rates depend on the serial device.  Default 9600
+bps.
+.It Fl q
+Be quiet.  By default,
+.Nm
+will report the device and parameters used before making the connection,
+report the end of the connection before terminating and display executed escape actions.  With this option,
+only errors will be reported.
+.It Fl ?
+Print usage summary.
+.El
+.Ss Escape Character
+The escape character can be used to end the connection to the serial device,
+send special characters over the connection, and terminate
+.Nm .
+The escape character must always follow a newline (more specific: a carriage return character) to be interpreted as
+special.  The character can be changed using the
+.Fl e
+option.  Some escape actions output a message indicating which action was executed.  To turn off those messages use the
+.Fl q
+option.  A note for non-english keyboard layouts: your ~ key may be in
+compose mode to create characters like ~a.  In this case you will have to
+press ~ twice to send a single character to the sc program.
+.Pp
+The supported escapes (assuming the default
+.Ql ~ )
+are:
+.Bl -tag -width Ds
+.It Cm ~~
+Send a single ~ to the device.
+.It Cm ~.
+Disconnect.
+.It Cm ~B
+Send a BREAK to the device, if supported by the driver.
+.It Cm ~X<2x hex character>
+Reads two hexadecimal digits and sends one byte representing those digits.  Valid hex characters are 0-9, a-f, A-F.
+.El
+.\" .Sh BUGS
+.Sh SEE ALSO
+.Xr stty 1
+.Xr termios 4
+.Xr tty 4
+.Pp
+Tiny serial terminal: http://brokestream.com/tinyserial.html
+.Pp
+dterm: http://www.knossos.net.nz/dterm.html
+.\" .Sh HISTORY
+.Sh AUTHOR
+The
+.Nm
+utility was written by Stefan Bethke <stb@lassitu.de>.
